@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package replication;
+option go_package = "https://github.com/jskoven/dissys_mandatory_5_forreal;replication";
+
+
+
+service replication {
+    rpc receivebid (bidPackage) returns (confirmation);
+    rpc result (empty) returns (resultPackage);
+}
+
+message bidPackage{
+    int32 bid = 1;
+    string bidder = 2;
+}
+
+message confirmation{
+    bool confirmation = 1;
+    int32 currentPrice = 2;
+    string currentWinner = 3;
+    bool hasEnded = 4;
+}
+
+message resultPackage{
+    int32 highestbid = 1;
+    string winner = 2;
+    bool hasEnded = 3;
+}
+message empty{
+
+}
