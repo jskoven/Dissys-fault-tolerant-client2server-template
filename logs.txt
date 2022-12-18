@@ -185,3 +185,12 @@
 2022/12/18 15:53:34 Client %!s(int32=9000) connected to port %!d(MISSING) 
 2022/12/18 15:53:34 Client %!s(int32=9001) connected to port %!d(MISSING) 
 2022/12/18 15:53:34 Client %!s(int32=9002) connected to port %!d(MISSING) 
+2022/12/18 16:04:37 Starting server...
+2022/12/18 16:04:37 Listening on port :9000
+2022/12/18 16:04:37 Starting server...
+2022/12/18 16:04:37 Listening on port :9001
+2022/12/18 16:04:38 Starting server...
+2022/12/18 16:04:38 Listening on port :9002
+2022/12/18 16:04:53 Client %!s(int32=9000) connected to port %!d(MISSING) 
+2022/12/18 16:04:53 Client %!s(int32=9001) connected to port %!d(MISSING) 
+2022/12/18 16:04:53 Client %!s(int32=9002) connected to port %!d(MISSING) 

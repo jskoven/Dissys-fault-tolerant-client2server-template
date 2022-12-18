@@ -42,7 +42,11 @@ func main() {
 	}
 
 	/*For loop to connect the client to each of the servers. This template needs 3 servers to run, with
-	the correct ports (9000 to 9002) to function. It saves the servers to the client structs map.*/
+	the correct ports (9000 to 9002) to function. It saves the servers to the client structs map.
+
+	### If the program doesn't need to be a fault tolerant program with replication, a single
+	server just needs to be connected to instead of this loop. Remove the loop and simply
+	connect to the single port you've set your server to be listening on. ###*/
 	for i := 0; i < 3; i++ {
 		port := int32(9000) + int32(i)
 		var conn *grpc.ClientConn
