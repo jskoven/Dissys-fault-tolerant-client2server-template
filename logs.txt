@@ -167,3 +167,21 @@
 2022/12/18 14:47:56 Replica #9002:  Increasing bid to 500
 2022/12/18 14:47:56 Replica #9002:  New user detected, adding "Johan" to list of users.
 2022/12/18 14:47:56 User Johan has succesfully bid 500 
+2022/12/18 15:51:11 Starting server...
+2022/12/18 15:51:11 Listening on port :9000
+2022/12/18 15:51:46 Starting server...
+2022/12/18 15:51:46 Listening on port :9002
+2022/12/18 15:51:46 Starting server...
+2022/12/18 15:51:46 Listening on port :9001
+2022/12/18 15:52:05 Client %!s(int32=9000) connected to port %!d(MISSING) 
+2022/12/18 15:52:05 Client %!s(int32=9001) connected to port %!d(MISSING) 
+2022/12/18 15:52:05 Client %!s(int32=9002) connected to port %!d(MISSING) 
+2022/12/18 15:53:11 Starting server...
+2022/12/18 15:53:11 Listening on port :9002
+2022/12/18 15:53:12 Starting server...
+2022/12/18 15:53:12 Listening on port :9001
+2022/12/18 15:53:12 Starting server...
+2022/12/18 15:53:12 Listening on port :9000
+2022/12/18 15:53:34 Client %!s(int32=9000) connected to port %!d(MISSING) 
+2022/12/18 15:53:34 Client %!s(int32=9001) connected to port %!d(MISSING) 
+2022/12/18 15:53:34 Client %!s(int32=9002) connected to port %!d(MISSING) 

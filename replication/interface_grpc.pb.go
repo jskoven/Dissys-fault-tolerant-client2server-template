@@ -18,8 +18,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReplicationClient interface {
-	Receivebid(ctx context.Context, in *BidPackage, opts ...grpc.CallOption) (*Confirmation, error)
-	Result(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ResultPackage, error)
+	// Describe RPC methods here, first parameter is what is sent, second is return value.
+	Send(ctx context.Context, in *Package, opts ...grpc.CallOption) (*Package, error)
+	SendNoAnswer(ctx context.Context, in *Package, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type replicationClient struct {
@@ -30,18 +31,18 @@ func NewReplicationClient(cc grpc.ClientConnInterface) ReplicationClient {
 	return &replicationClient{cc}
 }
 
-func (c *replicationClient) Receivebid(ctx context.Context, in *BidPackage, opts ...grpc.CallOption) (*Confirmation, error) {
-	out := new(Confirmation)
-	err := c.cc.Invoke(ctx, "/replication.replication/receivebid", in, out, opts...)
+func (c *replicationClient) Send(ctx context.Context, in *Package, opts ...grpc.CallOption) (*Package, error) {
+	out := new(Package)
+	err := c.cc.Invoke(ctx, "/replication.replication/send", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *replicationClient) Result(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ResultPackage, error) {
-	out := new(ResultPackage)
-	err := c.cc.Invoke(ctx, "/replication.replication/result", in, out, opts...)
+func (c *replicationClient) SendNoAnswer(ctx context.Context, in *Package, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/replication.replication/sendNoAnswer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +53,9 @@ func (c *replicationClient) Result(ctx context.Context, in *Empty, opts ...grpc.
 // All implementations must embed UnimplementedReplicationServer
 // for forward compatibility
 type ReplicationServer interface {
-	Receivebid(context.Context, *BidPackage) (*Confirmation, error)
-	Result(context.Context, *Empty) (*ResultPackage, error)
+	// Describe RPC methods here, first parameter is what is sent, second is return value.
+	Send(context.Context, *Package) (*Package, error)
+	SendNoAnswer(context.Context, *Package) (*Empty, error)
 	mustEmbedUnimplementedReplicationServer()
 }
 
@@ -61,11 +63,11 @@ type ReplicationServer interface {
 type UnimplementedReplicationServer struct {
 }
 
-func (UnimplementedReplicationServer) Receivebid(context.Context, *BidPackage) (*Confirmation, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Receivebid not implemented")
+func (UnimplementedReplicationServer) Send(context.Context, *Package) (*Package, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Send not implemented")
 }
-func (UnimplementedReplicationServer) Result(context.Context, *Empty) (*ResultPackage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Result not implemented")
+func (UnimplementedReplicationServer) SendNoAnswer(context.Context, *Package) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendNoAnswer not implemented")
 }
 func (UnimplementedReplicationServer) mustEmbedUnimplementedReplicationServer() {}
 
@@ -80,38 +82,38 @@ func RegisterReplicationServer(s grpc.ServiceRegistrar, srv ReplicationServer) {
 	s.RegisterService(&Replication_ServiceDesc, srv)
 }
 
-func _Replication_Receivebid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BidPackage)
+func _Replication_Send_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Package)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReplicationServer).Receivebid(ctx, in)
+		return srv.(ReplicationServer).Send(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/replication.replication/receivebid",
+		FullMethod: "/replication.replication/send",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReplicationServer).Receivebid(ctx, req.(*BidPackage))
+		return srv.(ReplicationServer).Send(ctx, req.(*Package))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Replication_Result_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+func _Replication_SendNoAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Package)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReplicationServer).Result(ctx, in)
+		return srv.(ReplicationServer).SendNoAnswer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/replication.replication/result",
+		FullMethod: "/replication.replication/sendNoAnswer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReplicationServer).Result(ctx, req.(*Empty))
+		return srv.(ReplicationServer).SendNoAnswer(ctx, req.(*Package))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,12 +126,12 @@ var Replication_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ReplicationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "receivebid",
-			Handler:    _Replication_Receivebid_Handler,
+			MethodName: "send",
+			Handler:    _Replication_Send_Handler,
 		},
 		{
-			MethodName: "result",
-			Handler:    _Replication_Result_Handler,
+			MethodName: "sendNoAnswer",
+			Handler:    _Replication_SendNoAnswer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

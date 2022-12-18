@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jskoven/dissys_mandatory_5_forreal/replication"
+	"github.com/jskoven/Dissys-fault-tolerant-client2server-template/replication"
 
 	"google.golang.org/grpc"
 )
@@ -21,29 +21,27 @@ var (
 )
 
 func main() {
+	//Setting log output
 	f, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		log.Printf("Eror on opening file: %s", err)
 	}
 	log.SetOutput(f)
+
+	/*The part below is responsible for making each server listen on their own port. They need to be
+	started with "go run server.go 0" up to 2, to make them run on the correct ports.*/
 	arg1, _ := strconv.ParseInt(os.Args[1], 10, 32)
 	ownPort := int32(arg1) + 9000
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", ownPort))
 	log.Printf("Starting server...")
-
 	if err != nil {
 		log.Printf("Failed to listen on port :%d, Error: %s", ownPort, err)
 	}
-
 	log.Printf("Listening on port :%d", ownPort)
 
 	grpcserver := grpc.NewServer()
-
-	server := Biddinghouse{}
-	server.currentbid = 0
-	server.winner = "none yet"
+	server := ServerStruct{}
 	server.id = ownPort
-	server.bidders = make(map[string]string)
 	replication.RegisterReplicationServer(grpcserver, &server)
 
 	err = grpcserver.Serve(listener)
@@ -51,65 +49,25 @@ func main() {
 		log.Printf("Replica #%d:  Failed to serve with listener, error: %s\n", server.id, err)
 
 	}
-	timeLimit = timestamp.Add(time.Duration(500) * time.Minute)
 
 }
 
-type Biddinghouse struct {
-	currentbid int32
-	itemprice  int32
-	winner     string
-	mux        sync.Mutex
+type ServerStruct struct {
+	mux sync.Mutex
 	replication.UnimplementedReplicationServer
-	id      int32
-	bidders map[string]string
+	id int32
 }
 
-func (b *Biddinghouse) Receivebid(ctx context.Context, bid *replication.BidPackage) (con *replication.Confirmation, err error) {
-	bidFromBidder := bid.Bid
-	conpackage := &replication.Confirmation{}
-	if b.currentbid == 0 {
-		timestamp = time.Now()
-		timeLimit = timestamp.Add(time.Duration(1) * time.Minute)
-	}
-	if timeLimit.Before(time.Now()) {
-		log.Printf("Replica #%d:  Timelimit reached, auction ending.\n", b.id)
-		conpackage.HasEnded = true
-	} else if bidFromBidder > b.currentbid {
-		//Increase bid
-		log.Printf("Replica #%d:  Increasing bid to %d\n", b.id, bidFromBidder)
-		b.mux.Lock()
-		b.currentbid = bid.Bid
-		b.winner = bid.Bidder
-		conpackage.CurrentWinner = b.winner
-		conpackage.CurrentPrice = b.currentbid
-		b.mux.Unlock()
-		conpackage.Confirmation = true
-	} else {
-		//Bid not high enough
-		conpackage.Confirmation = false
-		b.mux.Lock()
-		conpackage.CurrentWinner = b.winner
-		conpackage.CurrentPrice = b.currentbid
-		b.mux.Unlock()
-	}
-	if b.bidders[bid.Bidder] == "" {
-		b.bidders[bid.Bidder] = bid.Bidder
-		log.Printf("Replica #%d:  New user detected, adding \"%s\" to list of users.", b.id, bid.Bidder)
-	}
-	return conpackage, nil
-}
+/*
+The grpc method below must contain all this (context, etc) to work. The exact function header
+can be found in the grpc.pb.go file, and almost just copy pasted in since it is auto-generated
+from the .proto file.
+*/
+func (b *ServerStruct) Send(ctx context.Context, message *replication.Package) (answer *replication.Package, err error) {
+	messageString := message.Message
+	answerPackage := &replication.Package{}
 
-func (b *Biddinghouse) Result(ctx context.Context, empty *replication.Empty) (res *replication.ResultPackage, err error) {
-	log.Printf("Replica #%d: Result requested from user, answering with result message.\n", b.id)
-	resultPackage := &replication.ResultPackage{}
-	resultPackage.Winner = b.winner
-	resultPackage.Highestbid = b.currentbid
-	if timeLimit.Before(time.Now()) {
-		resultPackage.HasEnded = true
-	} else {
-		resultPackage.HasEnded = false
-	}
-	return resultPackage, nil
-
+	fmt.Printf("Received message from client: %s \n", messageString)
+	answerPackage.Message = "We've received your message, thank you!"
+	return answerPackage, nil
 }

@@ -1,5 +1,8 @@
-module github.com/jskoven/dissys_mandatory_5_forreal
+module github.com/jskoven/Dissys-fault-tolerant-client2server-template
 
+//The module needs to be the correct link to the repository currently being worked in.
+//If it isn't, go mod tidy wont download the correct files to use in imports, and
+//grpc methods from the replication folder wont be able to be used.
 go 1.19
 
 require (
