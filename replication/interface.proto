@@ -4,27 +4,18 @@ package replication;
 option go_package = "https://github.com/jskoven/Dissys-fault-tolerant-client2server-template;replication";
 
 service replication {
-    rpc receivebid (bidPackage) returns (confirmation);
-    rpc result (empty) returns (resultPackage);
+    //Describe RPC methods here, first parameter is what is sent, second is return value.
+    rpc send (package) returns (package);
+    rpc sendNoAnswer(package) returns (empty);
+    
 }
 
-message bidPackage{
-    int32 bid = 1;
-    string bidder = 2;
+//Generic package. Packages can be named whatever and contain whatever
+message package{
+    string message = 1;
 }
 
-message confirmation{
-    bool confirmation = 1;
-    int32 currentPrice = 2;
-    string currentWinner = 3;
-    bool hasEnded = 4;
-}
-
-message resultPackage{
-    int32 highestbid = 1;
-    string winner = 2;
-    bool hasEnded = 3;
-}
+//Empty package used when nothing should be returned
 message empty{
 
 }
