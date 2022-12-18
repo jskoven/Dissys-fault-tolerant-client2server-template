@@ -1,9 +1,7 @@
 syntax = "proto3";
 
 package replication;
-option go_package = "https://github.com/jskoven/dissys_mandatory_5_forreal;replication";
-
-
+option go_package = "https://github.com/jskoven/Dissys-fault-tolerant-client2server-template;replication";
 
 service replication {
     rpc receivebid (bidPackage) returns (confirmation);
